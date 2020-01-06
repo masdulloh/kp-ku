@@ -70,16 +70,6 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="select2">Subdistrict</label> 
-        <div>
-        <select id="select2" name="select2" class="custom-select" v-model="psubdistrict">
-            <option value="rabbit">Rabbit</option>
-            <option value="duck">Duck</option>
-            <option value="fish">Fish</option>
-        </select>
-        </div>
-    </div> 
-    <div class="form-group">
         <p v-if="feedback" class="danger">{{ feedback }}</p>
         <button name="submit" type="submit" class="btn btn-primary">Save</button>
     </div>
@@ -94,16 +84,14 @@
 //import slugify from 'slugify'
 import db from '@/firebase/init'
 import firebase from 'firebase'
-
+import axios from 'axios'
 
 export default {
     name: 'AddProducts',
     data(){
         return{
             profile:null,
-            //user:null,
             
-
             pname:null,
             plink:null,
             pimage: null,
@@ -113,7 +101,6 @@ export default {
             plocation: null,
             pprovince: null,
             pcity: null,
-            psubdistrict: null,
             
             provinsi: [],
             kota: [],
@@ -123,15 +110,17 @@ export default {
     },
     created(){
 
-        this.$http.get('/components/panggil').then(function(data){
-            console.log(data)
+        axios({
+            method: 'get',
+            url: 'http://api.url.my.id/api/raja-ongkir/mootaprofile',
+            responseType: 'stream',
+            headers: {
+                'Access-Control-Allow-Origin' : '*'
+            }
         })
-
-
-
-
-        /* NANTI NYALAKAN LAGI 
-
+        .then(function (response) {
+            console.log(response)
+        });
 
         db.collection('provinces').get()
         .then(snapshot => {
@@ -150,13 +139,10 @@ export default {
         .catch(err => {
             console.log('Error getting documents', err);
         });
-        
-        */
 
 
 
 
-        //console.log(this.provinsi)
         /*
         let ref = db.collection('users')
         //get current user

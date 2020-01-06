@@ -102,6 +102,7 @@ export default {
         return{
             profile:null,
             //user:null,
+            
 
             pname:null,
             plink:null,
@@ -122,51 +123,16 @@ export default {
     },
     created(){
 
-
-        let qs = require("querystring");
-        let http = require("https");
-
-        let options = {
-        "method": "POST",
-        "hostname": "api.rajaongkir.com",
-        "port": null,
-        "path": "/starter/cost",
-        "headers": {
-            "mode":"no-cors",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST, GET, PUT, OPTIONS, DELETE",
-            "Access-Control-Allow-Headers": "Access-Control-Allow-Methods, Access-Control-Allow-Origin, Origin, Accept, Content-Type",
-            "key": "a2763eec7f7f39696206a5ad583fcb2a",
-            "content-type": "application/x-www-form-urlencoded",
-            "Accept": "application/json"
-        }
-        };
-
-        let req = http.request(options, res => {
-            let chunks = [];
-
-            res.on("data", chunk => {
-                chunks.push(chunk);
-            });
-
-            res.on("end", () => {
-                let body = Buffer.concat(chunks);
-                console.log(body.toString());
-            });
-        });
-
-        req.write(qs.stringify({
-            origin: '501', 
-            destination: '114', 
-            weight: 1700, 
-            courier: 'jne'
-        }));
-        req.end();
+        this.$http.get('/components/panggil').then(function(data){
+            console.log(data)
+        })
 
 
 
 
-        /*
+        /* NANTI NYALAKAN LAGI 
+
+
         db.collection('provinces').get()
         .then(snapshot => {
             if (snapshot.empty) {
@@ -184,7 +150,12 @@ export default {
         .catch(err => {
             console.log('Error getting documents', err);
         });
+        
         */
+
+
+
+
         //console.log(this.provinsi)
         /*
         let ref = db.collection('users')
@@ -299,6 +270,7 @@ export default {
 
     },
     mounted(){
+        
         //munculkan user sekarang
         //console.log(firebase.auth().currentUser)
     }

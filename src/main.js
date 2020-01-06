@@ -6,8 +6,13 @@ import router from './router'
 import firebase from 'firebase'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import VueResource from 'vue-resource'
+
 
 Vue.config.productionTip = false
+
+Vue.use(VueResource)
+
 
 let app = null;
 

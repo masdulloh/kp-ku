@@ -66,33 +66,23 @@
     <div class="form-group">
         <label for="select">Province</label> 
         <div>
-        <select id="select" name="select" class="custom-select" required="required" v-model="pprovince">
-            <option value="fish" >1</option>
-        </select>
+            <select id="select" name="select" required="required" @change="selectProvince($event)" class="custom-select" v-model="pprovince">
+                <option v-for="(prov, index) in provinsi" :key="index" :value="prov.province_id">{{ prov.province}}</option>
+            </select>
         </div>
     </div>
 
+
+    <!-- City -->
     <!-- City -->
     <div class="form-group">
         <label for="select1">City</label> 
         <div>
-            <select id="select1" name="select1" class="custom-select" v-model="pcity">
-                <option value="rabbit">Rabbit</option>
-            </select>
+        <select id="select1" name="select1" required="required" class="custom-select" v-model="pcity">
+            <option v-for="(cit, index) in kota" :key="index" :value="cit.city_id">{{ cit.city_name}}</option>
+        </select>
         </div>
     </div>
-
-    <!-- Subdistrict -->
-    <div class="form-group">
-        <label for="select2">Subdistrict</label> 
-        <div>
-            <select id="select2" name="select2" class="custom-select" v-model="psubdistrict">
-                <option value="rabbit">Rabbit</option>
-                <option value="duck">Duck</option>
-                <option value="fish">Fish</option>
-            </select>
-        </div>
-    </div> 
 
     <!-- Feedback -->
     <div class="form-group">
@@ -127,13 +117,35 @@ export default {
             ploc: [],
             pprovince: null,
             pcity: null,
-            psubdistrict: null,
-            
+
+            provinsi: [],
+            kota: [],
 
             feedback: null
         }
     },
     created(){
+
+        db.collection('provinces').get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return;
+            } 
+            snapshot.forEach(doc => {
+                this.provinsi.unshift({
+                    province_id: doc.data().province_id,
+                    province: doc.data().province
+                })
+                //console.log(doc.id, '=>', doc.data());
+            });
+        })
+        .catch(err => {
+            console.log('Error getting documents', err);
+        });
+
+
+        
         // get current user
         /*
         firebase.auth().onAuthStateChanged((user) => {
@@ -165,13 +177,34 @@ export default {
                 this.pweight = doc.data().pweight
 
                 this.ploc=doc.data().ploc
-                //console.log(doc.data().ploc)
                 this.pprovince = this.ploc.province
-                //console.log(this.ploc.province)
                 this.pcity = this.ploc.city
-                this.psubdistrict = this.ploc.subdistrict
+
+
+                //CITY
+                db.collection('citys').where('province_id', '==', this.pprovince).get()
+                .then(snapshot => {
+                    if (snapshot.empty) {
+                        console.log('No city matching documents.');
+                        return;
+                    } 
+                    snapshot.forEach(doc => {
+                        this.kota.unshift({
+                            city_id: doc.data().city_id,
+                            city_name: doc.data().city_name
+                        })
+                        //console.log(doc.id, '=>', doc.data());
+                    });
+                })
+                .catch(err => {
+                    console.log('Error getting documents', err);
+                }); 
+                //CITY
             }
         })
+
+
+        
 
     },
     methods:{
@@ -198,7 +231,7 @@ export default {
         },
         editProduct(){
             //TODO
-            if(this.pname && this.pimage && this.plink && this.pweight && this.pprovince && this.pcity && this.psubdistrict){
+            if(this.pname && this.pimage && this.plink && this.pweight && this.pprovince && this.pcity){
                 
                 //let ref2 = db.collection('products').doc(this.plink)
                 //plink=this.plink
@@ -212,12 +245,10 @@ export default {
                     pweight: Number(this.pweight),
                     ploc: {
                         province: this.pprovince,
-                        city: this.pcity,
-                        subdistrict: this.psubdistrict,
+                        city: this.pcity
                     }
                     //pcreatby: this.user.id
                 }
-
                 db.collection('products').doc(this.$route.params.id).update(data)
                 .then(() => {
                     this.$router.push({ name: 'Products' })
@@ -228,6 +259,30 @@ export default {
             } else {
                 this.feedback="Please fill the blank form"
             }
+        },
+        // SELECT PROVINCE FUNCTION
+        selectProvince(event){
+            //console.log(event.target.value)
+            this.pcity= null
+            this.kota= []
+            db.collection('citys').where('province_id', '==', this.pprovince).get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    console.log('No city matching documents.');
+                    return;
+                } 
+                snapshot.forEach(doc => {
+                    this.kota.unshift({
+                        city_id: doc.data().city_id,
+                        city_name: doc.data().city_name
+                    })
+                    //console.log(doc.id, '=>', doc.data());
+                });
+            })
+            .catch(err => {
+                console.log('Error getting documents', err);
+            });
+
         }
     },
     mounted(){

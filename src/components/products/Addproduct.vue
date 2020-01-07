@@ -37,7 +37,7 @@
         <div class="input-group-prepend">
             <div class="input-group-text">Rp</div>
         </div> 
-        <input id="text2" name="text2" type="text" class="form-control" required="required" v-model="pcogs">
+        <input id="text2" name="text2" type="text" required="required" class="form-control" v-model="pcogs">
         </div>
     </div>
     <div class="form-group">
@@ -54,7 +54,7 @@
     <div class="form-group">
         <label for="select">Province</label> 
         <div>
-            <select id="select" name="select" @change="selectProvince($event)" class="custom-select" required="required" v-model="pprovince">
+            <select id="select" name="select" required="required" @change="selectProvince($event)" class="custom-select" v-model="pprovince">
                 <option v-for="(prov, index) in provinsi" :key="index" :value="prov.province_id">{{ prov.province}}</option>
             </select>
         </div>
@@ -64,11 +64,12 @@
     <div class="form-group">
         <label for="select1">City</label> 
         <div>
-        <select id="select1" name="select1" class="custom-select" v-model="pcity">
+        <select id="select1" name="select1" required="required" class="custom-select" v-model="pcity">
             <option v-for="(cit, index) in kota" :key="index" :value="cit.city_id">{{ cit.city_name}}</option>
         </select>
         </div>
     </div>
+    
     <div class="form-group">
         <p v-if="feedback" class="danger">{{ feedback }}</p>
         <button name="submit" type="submit" class="btn btn-primary">Save</button>
@@ -110,18 +111,6 @@ export default {
     },
     created(){
 
-        axios({
-            method: 'get',
-            url: 'http://api.url.my.id/api/raja-ongkir/mootaprofile',
-            responseType: 'stream',
-            headers: {
-                'Access-Control-Allow-Origin' : '*'
-            }
-        })
-        .then(function (response) {
-            console.log(response)
-        });
-
         db.collection('provinces').get()
         .then(snapshot => {
             if (snapshot.empty) {
@@ -139,8 +128,6 @@ export default {
         .catch(err => {
             console.log('Error getting documents', err);
         });
-
-
 
 
         /*
@@ -239,20 +226,7 @@ export default {
                 console.log('Error getting documents', err);
             });
 
-
-        
-
-
-
-
         }
-        
-        //Ketika city dipilih
-        /*
-        selectCity(event){
-            console.log(event.target.value)
-        }
-        */
 
     },
     mounted(){

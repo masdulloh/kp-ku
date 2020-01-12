@@ -1,0 +1,203 @@
+<template>
+    <div class="buy">
+        <h2>Buy</h2>
+        <form @submit.prevent="buyProduct">
+
+            <h4>{{ pname }}</h4>
+            
+            <div class="number-input md-number-input">
+                <button v-if="oqty >1" v-on:click="oqty -= 1; inputQty()" class="minus">-</button>
+                <input class="quantity" min="1" name="quantity" max="99" type="number" v-model="oqty" @change="inputQty">
+                <button v-on:click="oqty += 1; inputQty()" class="plus">+</button>
+            </div>
+
+            <div class="form-group">
+                <label for="text">Nama</label> 
+                <input id="text2" name="text" type="text" required="required" class="form-control" v-model="oname">
+            </div>
+
+            <div class="form-group">
+                <label for="text">Nomor Whatsapp</label> 
+                <input id="text3" name="text" type="text" required="required" class="form-control" v-model="owhatsapp">
+            </div>
+            
+            <!-- Province -->
+            <div class="form-group">
+                <label for="select">Provinsi</label> 
+                <div>
+                    <select id="select" name="select" required="required" @change="selectProvince($event)" class="custom-select" v-model="oprovince">
+                        <option v-for="(prov, index) in provinsi" :key="index" :value="prov.province_id">{{ prov.province}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- City -->
+            <div class="form-group">
+                <label for="select1">Kota/Kabupaten</label> 
+                <div>
+                <select id="select1" name="select1" required="required" class="custom-select" v-model="ocity" @change="selectCity($event)">
+                    <option v-for="(cit, index) in kota" :key="index" :value="cit.city_id">{{ cit.city_name}}</option>
+                </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="text">Alamat Lengkap</label> 
+                <textarea id="text6" name="text-area" type="text" required="required" class="form-control" v-model="oalamat"></textarea>
+            </div>
+            <div class="form-group">
+
+            </div>
+            <div class="form-group">
+                <p>Total berat : {{ oweight }} gr</p>
+                <p>Ongkos Kirim: Rp. {{ ongkir }}</p>
+                <p v-if="feedback" class="danger">{{ feedback }}</p>
+                <button name="submit" type="submit" class="btn btn-primary">Beli Sekarang</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<script>
+import db from '@/firebase/init'
+import firebase from 'firebase'
+import axios from 'axios'
+
+export default {
+    name: 'Buy',
+    data(){
+        return{
+            pprovince: null,
+            pcity: null,
+            plink: null,
+            pname:null,
+            pweight: 0, 
+
+            provinsi: [],
+            kota: [],
+
+            oproduct: null, // product id
+            oname: null,
+            owhatsapp: null,
+            oprovince: null,
+            ocity: null,
+            oalamat: null,
+            oqty: 1,
+            oprice: 0,
+            ocourier: null,
+            ongkir:0,
+            ototal: 0,
+            odate: null,
+            oweight:0,
+
+            feedback: null
+        }
+    },
+    created(){
+        //console.log(this.$route.params.id)
+        this.plink=this.$route.params.id
+
+        let ref = db.collection('products').where('plink', '==', this.plink)
+        //get current product
+        ref.get().then(snapshot => {
+            if (snapshot.empty) {
+                // Jika produk yang mau di edit tidak ditemukan
+                console.log('Empty data for product link = ', this.plink)
+                return
+            }
+            snapshot.forEach(doc => {
+                this.oproduct = doc.id
+                this.pname = doc.data().pname
+                this.oprice = doc.data().pprice
+                this.pcogs = doc.data().pcogs
+                
+                this.pprovince = doc.data().ploc.province
+                this.pcity = doc.data().ploc.city
+                this.pweight = doc.data().pweight
+                this.oweight = this.pweight*this.oqty
+                
+            }); 
+        }).catch(err => {
+            console.log('Error getting documents', err)
+        })
+
+        db.collection('provinces').get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                console.log('No matching documents.');
+                return;
+            } 
+            snapshot.forEach(doc => {
+                this.provinsi.unshift({
+                    province_id: doc.data().province_id,
+                    province: doc.data().province
+                })
+                //console.log(doc.id, '=>', doc.data());
+            });
+        })
+        .catch(err => {
+            console.log('Error getting documents', err);
+        });
+    },
+    methods:{
+        // SELECT PROVINCE FUNCTION
+        selectProvince(event){
+            //console.log(event.target.value)
+            this.ocity= null
+            this.kota= []
+            db.collection('citys').where('province_id', '==', this.oprovince).get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    console.log('No city matching documents.');
+                    return;
+                } 
+                snapshot.forEach(doc => {
+                    this.kota.unshift({
+                        city_id: doc.data().city_id,
+                        city_name: doc.data().city_name
+                    })
+                    //console.log(doc.id, '=>', doc.data());
+                });
+            })
+            .catch(err => {
+                console.log('Error getting documents', err);
+            });
+
+        },
+
+        // MEMILIH KOTA
+        selectCity(event){
+            axios.post('https://api.url.my.id/api/raja-ongkir/cost',{
+                'origin':this.pcity,
+                'destination':this.ocity,
+                'weight':this.oweight,
+                'courier':'jne'
+            }).then(response => {
+                if (response) {
+                    console.log(response.data.body)
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        },
+
+        // INPUT JUMLAH PEMBELIAN
+        inputQty(){
+            this.oweight = this.oqty*this.pweight
+        },
+
+        // BUY PRODUCT
+        buyProduct(){}
+    },
+    mounted(){
+        //munculkan user sekarang
+        //console.log(firebase.auth().currentUser)
+    }
+}
+</script>
+
+<style>
+
+
+</style>

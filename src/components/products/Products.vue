@@ -24,6 +24,7 @@
                     <td>
                         <button @click="editProduct(product.idprod)" type="button" class="btn btn-success">Edit</button>
                         <button @click="deleteProduct(product.idprod, index)" type="button" class="btn btn-danger">Delete</button>
+                        <button @click="buyProduct(product.plink)">checkout page</button>
                     </td>
                 </tr>
                 <!-- END -->
@@ -46,6 +47,7 @@ export default {
             pname: null,
             productdisplay:[],
             pprice: null,
+            plink: null,
             idprod: null
         }
     },
@@ -59,6 +61,7 @@ export default {
                         pname: change.doc.data().pname,
                         pprice: change.doc.data().pprice,
                         pimage: change.doc.data().pimage,
+                        plink: change.doc.data().plink,
                         idprod: change.doc.id
                     })
                 }if(change.type == 'removed'){
@@ -76,7 +79,6 @@ export default {
         },
 
         deleteProduct(doc,index){
-
             //productdisplay= this.productdisplay
             if (confirm('Are you sure ?')) {
                 console.log(doc)
@@ -89,9 +91,13 @@ export default {
                     console.log(error)
                 })
             }
+        },
+
+        buyProduct(id){
+            this.$router.push({ name:'Buy' , params: {id:id} })
         }
     },
-    // 
+    
     mounted(){
         //munculkan user sekarang
         //console.log(firebase.auth().currentUser)

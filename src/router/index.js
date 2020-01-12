@@ -8,6 +8,7 @@ import AddProduct from '@/components/products/AddProduct'
 import EditProduct from '@/components/products/EditProduct'
 
 import Orders from '@/components/home/Orders'
+import Buy from '@/components/home/Buy'
 
 import Signup from '@/components/auth/Signup'
 import Login from '@/components/auth/Login'
@@ -49,7 +50,12 @@ const router = new Router({
         meta: {
           requiresAuth: true
         }
-      },
+    },
+    {
+        path: '/buy/:id',
+        name: 'Buy',
+        component: Buy
+    },
     {
         path: '/orders',
         name: 'Orders',

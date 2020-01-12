@@ -35,7 +35,7 @@
             <div class="form-group">
                 <label for="select1">Kota/Kabupaten</label> 
                 <div>
-                <select id="select1" name="select1" required="required" class="custom-select" v-model="ocity" @change="selectCity($event)">
+                <select id="select1" name="select1" required="required" class="custom-select" v-model="ocity" @change="selectCity">
                     <option v-for="(cit, index) in kota" :key="index" :value="cit.city_id">{{ cit.city_name}}</option>
                 </select>
                 </div>
@@ -166,7 +166,7 @@ export default {
         },
 
         // MEMILIH KOTA
-        selectCity(event){
+        selectCity(){
             axios.post('https://api.url.my.id/api/raja-ongkir/cost',{
                 'origin':this.pcity,
                 'destination':this.ocity,
@@ -175,16 +175,24 @@ export default {
             }).then(response => {
                 if (response) {
                     console.log(response.data.body)
+                    this.ongkir = response.data.body.results[0].costs.filter(cari => {
+                        return cari.service == 'REG'
+                    })
+                    this.ongkir = this.ongkir[0].cost[0].value
+                    console.log(this.ongkir)
                 }
             })
             .catch(error => {
-                console.log(error)
+                console.log('Error When POST RAJAONGKIR', error)
             })
         },
 
         // INPUT JUMLAH PEMBELIAN
         inputQty(){
             this.oweight = this.oqty*this.pweight
+            if (this.ocity){
+                this.selectCity()
+            }
         },
 
         // BUY PRODUCT

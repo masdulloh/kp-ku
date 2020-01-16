@@ -10,21 +10,21 @@
                 <tr>
                 <th scope="col">Image</th>
                 <th scope="col">Product Name</th>
-                <th scope="col">Last</th>
-                <th scope="col"></th>
+                <th scope="col">Price</th>
+                <th scope="col">Action</th>
                 </tr>
             </thead>
             <tbody>
 
                 <!-- Perulangan menampilkan product dari database -->
                 <tr v-for="(product, index) in productdisplay" :key="index">
-                    <td><img :src=product.pimage alt="" width="150"></td>
-                    <td>{{ product.pname }}</td>
-                    <td>{{ product.pprice }}</td>
-                    <td>
+                    <td class="align-middle"><img :src=product.pimage alt="" width="75"></td>
+                    <td class="align-middle">{{ product.pname }}</td>
+                    <td class="align-middle">{{ product.pprice }}</td>
+                    <td class="align-middle">
                         <button @click="editProduct(product.idprod)" type="button" class="btn btn-success">Edit</button>
                         <button @click="deleteProduct(product.idprod, index)" type="button" class="btn btn-danger">Delete</button>
-                        <button @click="buyProduct(product.plink)">checkout page</button>
+                        <a class="text-primary" @click="buyProduct(product.plink)" exact :style="{ cursor: 'pointer'}">checkout page</a>
                     </td>
                 </tr>
                 <!-- END -->

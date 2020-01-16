@@ -25,8 +25,10 @@
     <!-- Image -->
     <div class="form-group">
         <label for="exampleFormControlFile1">Image</label>
-        <input type="file" class="form-control-file" id="exampleFormControlFile1" @change="uploadImage">
-        <input type="text" readonly class="form-control-plaintext" id="staticEmail" v-model="pimage">
+        <div class="input-group">
+            <img :src=this.pimage alt="" width="150">
+            <input type="file" class="form-control-file" id="exampleFormControlFile1" @change="uploadImage">
+        </div>
     </div>
 
     <!-- Price -->
@@ -86,7 +88,7 @@
 
     <!-- Feedback -->
     <div class="form-group">
-        <p v-if="feedback" class="danger">{{ feedback }}</p>
+        <p v-if="feedback" class="text-danger">{{ feedback }}</p>
         <button name="submit" type="submit" class="btn btn-primary">Save</button>
     </div>
     </form>

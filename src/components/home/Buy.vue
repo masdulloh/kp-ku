@@ -1,10 +1,6 @@
 <template>
     <div class="buy">
-        <h2>Buy</h2>
         <form @submit.prevent="buyProduct">
-
-            <h4>{{ pname }}</h4>
-            
             <div class="number-input md-number-input">
                 <button v-if="oqty >1" v-on:click="oqty -= 1; inputQty()" class="minus">-</button>
                 <input class="quantity" min="1" name="quantity" max="99" type="number" v-model="oqty" @change="inputQty">
@@ -12,13 +8,13 @@
             </div>
 
             <div class="form-group">
-                <label for="text">Nama</label> 
-                <input id="text2" name="text" type="text" required="required" class="form-control" v-model="oname">
+                <label for="text">Nama Lengkap</label> 
+                <input id="text2" name="text" type="text" required="required" class="form-control" v-model="oname" placeholder="Nama Lengkap">
             </div>
 
             <div class="form-group">
-                <label for="text">Nomor Whatsapp</label> 
-                <input id="text3" name="text" type="text" required="required" class="form-control" v-model="owhatsapp">
+                <label for="text">Nomor WhatsApp</label> 
+                <input id="text3" name="text" type="text" required="required" class="form-control" v-model="owhatsapp" placeholder="Nomor WhatsApp">
             </div>
             
             <!-- Province -->
@@ -43,14 +39,15 @@
 
             <div class="form-group">
                 <label for="text">Alamat Lengkap</label> 
-                <textarea id="text6" name="text-area" type="text" required="required" class="form-control" v-model="oalamat"></textarea>
+                <textarea id="text6" name="text-area" type="text" required="required" class="form-control" v-model="oalamat" placeholder="Nama jalan, Nomor Rumah, RT RW, dll"></textarea>
             </div>
             <div class="form-group">
 
             </div>
             <div class="form-group">
-                <p>Total berat : {{ oweight }} gr</p>
+                <p>Rincian pemesanan {{ pname }}</p>
                 <p>Ongkos Kirim: Rp. {{ ongkir }}</p>
+                <p>Total : Rp. {{ ototal }}</p>
                 <p v-if="feedback" class="danger">{{ feedback }}</p>
                 <button name="submit" type="submit" class="btn btn-primary">Beli Sekarang</button>
             </div>
@@ -174,12 +171,13 @@ export default {
                 'courier':'jne'
             }).then(response => {
                 if (response) {
-                    console.log(response.data.body)
+                    //console.log(response.data.body)
                     this.ongkir = response.data.body.results[0].costs.filter(cari => {
                         return cari.service == 'REG'
                     })
                     this.ongkir = this.ongkir[0].cost[0].value
-                    console.log(this.ongkir)
+                    this.ototal = this.ongkir + (this.oqty*this.oprice)
+                    //console.log(this.ongkir)
                 }
             })
             .catch(error => {

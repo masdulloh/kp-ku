@@ -31,10 +31,10 @@
                         <router-link :to="{ name: 'Signup' }" class="nav-link">SignUp</router-link>
                     </li>
                     <li class="nav-item" v-if="user">
-                        <a class="nav-link">{{ user.email }}</a>
+                        <a class="nav-link" exact :style="{ cursor: 'pointer'}">{{ user.email }}</a>
                     </li>
                     <li class="nav-item" v-if="user">
-                        <button class="btn btn-outline-success my-2 my-sm-0" @click="logout">Logot</button>
+                        <a class="nav-link" exact :style="{ cursor: 'pointer'}" @click="logout">Logot</a>
                     </li>
                 </ul>
                 <!--button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button-->

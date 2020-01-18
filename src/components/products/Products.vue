@@ -53,10 +53,16 @@ export default {
     },
     created(){
         //view product
-        db.collection('products')
+        this.showData()
+        //console.log(this.productdisplay)
+    },
+    methods:{
+        showData(){
+            let productdisplay=[]
+db.collection('products')
         .onSnapshot((snapshot) => {
             snapshot.docChanges().forEach(change => {
-                if(change.type == 'added'){
+                if(change.type === 'added'){
                     this.productdisplay.unshift({
                         pname: change.doc.data().pname,
                         pprice: change.doc.data().pprice,
@@ -64,15 +70,13 @@ export default {
                         plink: change.doc.data().plink,
                         idprod: change.doc.id
                     })
-                }if(change.type == 'removed'){
-                    this.productdisplay.$forceupdate()
+                }
+                if (change.type === 'removed') {
+                    this.$router.push({ name:'Beranda' })
                 }
             })
         })
-
-        //console.log(this.productdisplay)
-    },
-    methods:{
+        },
         editProduct(id){
             //TODO
             this.$router.push({ name: 'EditProduct', params: {id: id } })
@@ -84,7 +88,8 @@ export default {
                 console.log(doc)
                 db.collection('products').doc(doc).delete()
                 .then(function() {
-                    console.log("berhasil di delete", index)
+                    //console.log("berhasil di delete", index)
+                    //this.productdisplay.splice(1,1)
                     //this.$delete(this.productdisplay, index)
                     //const filteredItems = this.productdisplay.slice(0, index).concat(this.productdisplay.slice(index + 1, this.productdisplay.length))
                 }).catch(function(error){

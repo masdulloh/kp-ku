@@ -48,7 +48,7 @@
                 <p>Rincian pemesanan {{ pname }}</p>
                 <p>Ongkos Kirim: Rp. {{ ongkir }}</p>
                 <p>Total : Rp. {{ ototal }}</p>
-                <p v-if="feedback" class="danger">{{ feedback }}</p>
+                <p v-if="feedback" class="text-danger">{{ feedback }}</p>
                 <button name="submit" type="submit" class="btn btn-primary">Beli Sekarang</button>
             </div>
         </form>
@@ -76,6 +76,8 @@ export default {
             oproduct: null, // product id
             oname: null,
             owhatsapp: null,
+            oloc:null,
+            oloc:null,
             oprovince: null,
             ocity: null,
             oalamat: null,
@@ -86,6 +88,7 @@ export default {
             ototal: 0,
             odate: null,
             oweight:0,
+            overif: null,
 
             feedback: null
         }
@@ -162,6 +165,7 @@ export default {
 
         },
 
+
         // MEMILIH KOTA
         selectCity(){
             axios.post('https://api.url.my.id/api/raja-ongkir/cost',{
@@ -177,6 +181,7 @@ export default {
                     })
                     this.ongkir = this.ongkir[0].cost[0].value
                     this.ototal = this.ongkir + (this.oqty*this.oprice)
+                    //this.ocourier
                     //console.log(this.ongkir)
                 }
             })
@@ -194,7 +199,45 @@ export default {
         },
 
         // BUY PRODUCT
-        buyProduct(){}
+        buyProduct(){
+            this.overif = (firebase.firestore.Timestamp.now().seconds.toString()) + (firebase.firestore.Timestamp.now().nanoseconds.toString())
+
+            if(this.oqty && this.oname && this.owhatsapp && this.oprovince && this.ocity && this.oalamat){
+                this.feedback=null
+                let data = {
+                    product: this.oproduct, // product id
+                    name: this.oname,
+                    whatsapp: this.owhatsapp,
+                    loc:{
+                        province: this.oprovince,
+                        city: this.ocity,
+                        alamat: this.oalamat,
+                    },
+                    qty: Number(this.oqty),
+                    price: Number(this.oprice),
+                    courier: 'jne',
+                    ongkir:Number(this.ongkir),
+                    total: Number(this.ototal),
+                    date: firebase.firestore.Timestamp.now(),
+                    verif: this.overif,
+                    weight:Number(this.oweight),
+                }
+
+                db.collection('orders').add(data)
+                .then(ref => {
+                    //console.log('Added document with ID: ', ref.id)
+                    this.$router.push({ name: 'BuyComplete', params: {id:ref.id} })
+                }).catch(err => {
+                    console.log(err)
+                    this.feedback=err.message
+                })
+
+              
+            } else {
+                this.feedback="You must enter all form"
+            }
+        
+        }
     },
     mounted(){
         //munculkan user sekarang

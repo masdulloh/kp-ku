@@ -71,7 +71,7 @@
     </div>
     
     <div class="form-group">
-        <p v-if="feedback" class="danger">{{ feedback }}</p>
+        <p v-if="feedback" class="text-danger">{{ feedback }}</p>
         <button name="submit" type="submit" class="btn btn-primary">Save</button>
     </div>
     </form>
@@ -91,6 +91,7 @@ export default {
     name: 'AddProducts',
     data(){
         return{
+            user:null,
             profile:null,
             
             pname:null,
@@ -102,6 +103,7 @@ export default {
             plocation: null,
             pprovince: null,
             pcity: null,
+            ploc:null,
             
             provinsi: [],
             kota: [],
@@ -130,20 +132,22 @@ export default {
         });
 
 
-        /*
+        
         let ref = db.collection('users')
         //get current user
         ref.where('user_id','==', firebase.auth().currentUser.uid).get()
         .then(snapshot => {
             snapshot.forEach(doc => {
-            this.user = doc.data(),
-            this.user.id = doc.id
+                this.user = doc.data(),
+                this.user.id = doc.id
             })
         })
 
+        /*
         //profile data
         ref.doc(this.$route.params.id).get()
         .then(user => {
+            console.log(user.data())
             this.profile = user.data()
         })
         */
@@ -152,7 +156,7 @@ export default {
     },
     methods:{
         addProduct(){
-            if(this.pname && this.pimage && this.plink && this.pweight && this.pprovince && this.pcity && this.psubdistrict){
+            if(this.pname && this.plink && this.pweight && this.pprovince && this.pcity){
                 this.feedback=null
                 let data = {
                     plink: this.plink,
@@ -163,8 +167,7 @@ export default {
                     pweight: Number(this.pweight),
                     ploc: {
                         province: this.pprovince,
-                        city: this.pcity,
-                        subdistrict: this.psubdistrict,
+                        city: this.pcity
                     },
                     pcreatby: this.user.id
                 }

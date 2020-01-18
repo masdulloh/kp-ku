@@ -9,6 +9,7 @@ import EditProduct from '@/components/products/EditProduct'
 
 import Orders from '@/components/home/Orders'
 import Buy from '@/components/home/Buy'
+import BuyComplete from '@/components/home/BuyComplete'
 
 import Signup from '@/components/auth/Signup'
 import Login from '@/components/auth/Login'
@@ -55,6 +56,11 @@ const router = new Router({
         path: '/buy/:id',
         name: 'Buy',
         component: Buy
+    },
+    {
+        path: '/buycomplete/:id',
+        name: 'BuyComplete',
+        component: BuyComplete
     },
     {
         path: '/orders',

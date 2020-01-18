@@ -204,6 +204,9 @@ export default {
                 //CITY
             }
         })
+        .catch(err => {
+            console.log('Error getting documents', err);
+        })
 
 
         

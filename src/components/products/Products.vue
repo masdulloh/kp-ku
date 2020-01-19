@@ -59,23 +59,23 @@ export default {
     methods:{
         showData(){
             let productdisplay=[]
-db.collection('products')
-        .onSnapshot((snapshot) => {
-            snapshot.docChanges().forEach(change => {
-                if(change.type === 'added'){
-                    this.productdisplay.unshift({
-                        pname: change.doc.data().pname,
-                        pprice: change.doc.data().pprice,
-                        pimage: change.doc.data().pimage,
-                        plink: change.doc.data().plink,
-                        idprod: change.doc.id
-                    })
-                }
-                if (change.type === 'removed') {
-                    this.$router.push({ name:'Beranda' })
-                }
+            db.collection('products')
+            .onSnapshot((snapshot) => {
+                snapshot.docChanges().forEach(change => {
+                    if(change.type === 'added'){
+                        this.productdisplay.unshift({
+                            pname: change.doc.data().pname,
+                            pprice: change.doc.data().pprice,
+                            pimage: change.doc.data().pimage,
+                            plink: change.doc.data().plink,
+                            idprod: change.doc.id
+                        })
+                    }
+                    if (change.type === 'removed') {
+                        this.$router.push({ name:'Beranda' })
+                    }
+                })
             })
-        })
         },
         editProduct(id){
             //TODO

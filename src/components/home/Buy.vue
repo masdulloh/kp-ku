@@ -14,7 +14,7 @@
 
             <div class="form-group">
                 <label for="text">Nomor WhatsApp</label> 
-                <input id="text3" name="text" type="text" required="required" class="form-control" v-model="owhatsapp" placeholder="Nomor WhatsApp">
+                <input id="text3" name="text" type="number" required="required" class="form-control" v-model="owhatsapp" placeholder="Nomor WhatsApp">
             </div>
             
             <!-- Province -->
@@ -34,6 +34,7 @@
                 <select id="select1" name="select1" required="required" class="custom-select" v-model="ocity" @change="selectCity">
                     <option v-for="(cit, index) in kota" :key="index" :value="cit.city_id">{{ cit.city_name}}</option>
                 </select>
+                <p v-if="feedbackcity" class="text-danger">{{ feedbackcity }}</p>
                 </div>
             </div>
 
@@ -89,8 +90,10 @@ export default {
             odate: null,
             oweight:0,
             overif: null,
+            onet: 0,
 
-            feedback: null
+            feedback: null,
+            feedbackcity: null
         }
     },
     created(){
@@ -145,6 +148,7 @@ export default {
             //console.log(event.target.value)
             this.ocity= null
             this.kota= []
+            this.feedback=null
             db.collection('citys').where('province_id', '==', this.oprovince).get()
             .then(snapshot => {
                 if (snapshot.empty) {
@@ -168,26 +172,44 @@ export default {
 
         // MEMILIH KOTA
         selectCity(){
-            axios.post('https://api.url.my.id/api/raja-ongkir/cost',{
-                'origin':this.pcity,
-                'destination':this.ocity,
-                'weight':this.oweight,
-                'courier':'jne'
-            }).then(response => {
-                if (response) {
-                    //console.log(response.data.body)
-                    this.ongkir = response.data.body.results[0].costs.filter(cari => {
-                        return cari.service == 'REG'
-                    })
-                    this.ongkir = this.ongkir[0].cost[0].value
-                    this.ototal = this.ongkir + (this.oqty*this.oprice)
-                    //this.ocourier
-                    //console.log(this.ongkir)
-                }
-            })
-            .catch(error => {
-                console.log('Error When POST RAJAONGKIR', error)
-            })
+            if (this.pcity===this.ocity){
+                this.ongkir = 7000;
+                this.hitung();
+
+            } else {
+                axios.post('https://api.url.my.id/api/raja-ongkir/cost',{
+                    'origin':this.pcity,
+                    'destination':this.ocity,
+                    'weight':this.oweight,
+                    'courier':'jne'
+                }).then(response => {
+                    if (response) {
+                        // CEK !! apakah pengiriman di daerah tersebut tersedia
+                        if (response.data.body.results[0].costs.length!==0){
+                            this.feedbackcity=null;
+
+                            this.ongkir = response.data.body.results[0].costs.filter(cari => {
+                                return cari.service == 'REG'
+                            })
+                        
+                            this.ongkir = this.ongkir[0].cost[0].value
+                            this.hitung();
+                        } 
+                        else {
+                            this.feedbackcity = 'Maaf, untuk lokasi pengiriman pada kota/kabupaten tersebut belum tersedia!'
+                            this.ongkir=null;
+                            this.hitung();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Error When POST RAJAONGKIR', error)
+                })
+            }
+        },
+
+        hitung(){
+            this.ototal = this.ongkir + (this.oqty*this.oprice);
         },
 
         // INPUT JUMLAH PEMBELIAN
@@ -200,10 +222,15 @@ export default {
 
         // BUY PRODUCT
         buyProduct(){
-            this.overif = (firebase.firestore.Timestamp.now().seconds.toString()) + (firebase.firestore.Timestamp.now().nanoseconds.toString())
+            this.onet= this.ototal - (this.ongkir + this.pcogs)
+            
+            this.overif = (firebase.firestore.Timestamp.now().seconds.toString()) + (firebase.firestore.Timestamp.now().nanoseconds.toString());
+            
+            //Cek apakah sudah di isi semua apa belum
+            if(this.oqty && this.oname && this.owhatsapp && this.oprovince && this.ocity && this.oalamat && this.ongkir){
+                this.feedback=null;
+                this.feedbackcity=null;
 
-            if(this.oqty && this.oname && this.owhatsapp && this.oprovince && this.ocity && this.oalamat){
-                this.feedback=null
                 let data = {
                     product: this.oproduct, // product id
                     name: this.oname,
@@ -217,10 +244,13 @@ export default {
                     price: Number(this.oprice),
                     courier: 'jne',
                     ongkir:Number(this.ongkir),
-                    total: Number(this.ototal),
+                    gross: Number(this.ototal),
                     date: firebase.firestore.Timestamp.now(),
                     verif: this.overif,
                     weight:Number(this.oweight),
+                    status: 'Pending',
+                    paystatus: 'Unpaid',
+                    net: this.onet
                 }
 
                 db.collection('orders').add(data)
@@ -234,7 +264,7 @@ export default {
 
               
             } else {
-                this.feedback="You must enter all form"
+                this.feedback='Pastikan semua form sudah terisi'
             }
         
         }

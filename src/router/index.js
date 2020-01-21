@@ -7,7 +7,8 @@ import Products from '@/components/products/Products'
 import AddProduct from '@/components/products/AddProduct'
 import EditProduct from '@/components/products/EditProduct'
 
-import Orders from '@/components/home/Orders'
+import Orders from '@/components/orders/Orders'
+
 import Buy from '@/components/home/Buy'
 import BuyComplete from '@/components/home/BuyComplete'
 

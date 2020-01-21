@@ -44,9 +44,9 @@
                             <a class="dropdown-item" v-if="order.status!=='Completed'" @click="statusnya('Completed', order.idorder)" exact :style="{ cursor: 'pointer'}">Completed</a>
                             <a class="dropdown-item" v-if="order.status!=='Cancelled'" @click="statusnya('Cancelled', order.idorder)" exact :style="{ cursor: 'pointer'}">Cancelled</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" v-if="order.paystatus!=='Unpaid'" @click="statusnya('Unpaid', order.idorder)" exact :style="{ cursor: 'pointer'}">Unpaid</a>
-                            <a class="dropdown-item" v-if="order.paystatus!=='Paid'" @click="statusnya('Paid', order.idorder)" exact :style="{ cursor: 'pointer'}">Paid</a>
-                            <a class="dropdown-item" v-if="order.paystatus!=='Refunded'" @click="statusnya('Refunded', order.idorder)" exact :style="{ cursor: 'pointer'}">Refunded</a>
+                            <a class="dropdown-item" v-if="order.paystatus!=='Unpaid'" @click="paystatusnya('Unpaid', order.idorder)" exact :style="{ cursor: 'pointer'}">Unpaid</a>
+                            <a class="dropdown-item" v-if="order.paystatus!=='Paid'" @click="paystatusnya('Paid', order.idorder)" exact :style="{ cursor: 'pointer'}">Paid</a>
+                            <a class="dropdown-item" v-if="order.paystatus!=='Refunded'" @click="paystatusnya('Refunded', order.idorder)" exact :style="{ cursor: 'pointer'}">Refunded</a>
                         </div>
                         </div>
                     </td>

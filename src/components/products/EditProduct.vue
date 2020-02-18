@@ -127,6 +127,23 @@ export default {
         }
     },
     created(){
+        let pengguna = db.collection('users') // Cari type user pada database
+        let querypengguna = pengguna.where('user_id', '==', firebase.auth().currentUser.uid).get().then(snapshot => {
+            if (snapshot.empty){
+                console.log('No matching users documents.');
+                return;
+            } 
+            snapshot.forEach(doc => {
+            //console.log(doc.id, '=>', doc.data());
+            this.usertype = doc.data().type
+            //console.log(this.usertype)
+            if (this.usertype!='admin'){
+                this.$router.push({ name: 'Beranda' })
+            }
+        });
+        }).catch(err => {
+            console.log('Error getting users documents', err);
+        });
 
         db.collection('provinces').get()
         .then(snapshot => {

@@ -2,7 +2,7 @@
     <div class="signup container">
         <form class="border border-light p-5" @submit.prevent="signup">
 
-            <p class="h4 mb-4 text-center">Sign up</p>
+            <p class="h4 mb-4 text-center">Add User</p>
 
             <p class="red" v-if="feedback">{{ feedback }}</p>
             <label for="textInput">Username</label>
@@ -14,18 +14,9 @@
             <label for="passwdInput">Password</label>
             <input type="password" id="passwdInput" class="form-control mb-4" placeholder="Password" v-model="password">
 
-            <button class="btn btn-info my-4 btn-block" type="submit">Sign up</button>
+            <button class="btn btn-info my-4 btn-block" type="submit">Add User</button>
 
-            <div class="text-center">
-                
-                <hr>
 
-                <p>By clicking
-                    <em>Sign up</em> you agree to our
-                    <a href="" target="_blank">terms of service</a> and
-                    <a href="" target="_blank">terms of service</a>.
-                </p>
-            </div>
         </form>
     </div>
 </template>
@@ -65,14 +56,15 @@ export default {
                     }
                     
                     else {
-                        var iki = this; //dikasih ini ga error wkwk
+                        //var iki = this; //dikasih ini ga error wkwk
                         // simpan
                         firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
-                        .then(function (userCreds) {
+                        .then(userCreds => {
                             //console.log('uid',userCreds.user.uid)
                             ref.set({
-                                username: iki.username,
-                                user_id: userCreds.user.uid
+                                username: this.username,
+                                user_id: userCreds.user.uid,
+                                type: 'cs'
                             })
                         }).then(() =>{
                             this.$router.push({ name: 'Beranda' })
@@ -86,7 +78,7 @@ export default {
                         this.feedback = 'username siap digunakan'
                     }
                 })
-                console.log(this.slug)
+                //console.log(this.slug)
             } else {
                 this.feedback= "Semua form harus terisi"
             }

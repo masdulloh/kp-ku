@@ -1,7 +1,7 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <router-link :to="{ name: 'Beranda' }" class="navbar-brand" href="#">URL.MY.ID</router-link>
+        <router-link :to="{ name: 'Beranda' }" class="navbar-brand" href="#">ORDER ONLINE</router-link>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -18,6 +18,9 @@
             <li class="nav-item" v-if="user">
                 <router-link :to="{ name: 'Orders' }" class="nav-link">Orders</router-link>
             </li>
+            <li class="nav-item" v-if="user && usertype=='admin'">
+                <router-link :to="{ name: 'Users' }" class="nav-link">Users</router-link>
+            </li>
 
             </ul>
 
@@ -27,14 +30,14 @@
                     <li class="nav-item" v-if="!user">
                         <router-link :to="{ name: 'Login' }" class="nav-link">Login</router-link>
                     </li>
-                    <li class="nav-item" v-if="!user">
-                        <router-link :to="{ name: 'Signup' }" class="nav-link">SignUp</router-link>
+                    <li class="nav-item" v-if="user && usertype=='admin'">
+                        <router-link :to="{ name: 'Signup' }" class="nav-link">Add User</router-link>
                     </li>
                     <li class="nav-item" v-if="user">
                         <a class="nav-link" exact :style="{ cursor: 'pointer'}">{{ user.email }}</a>
                     </li>
                     <li class="nav-item" v-if="user">
-                        <a class="nav-link" exact :style="{ cursor: 'pointer'}" @click="logout">Logot</a>
+                        <a class="nav-link" exact :style="{ cursor: 'pointer'}" @click="logout">Logout</a>
                     </li>
                 </ul>
                 <!--button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button-->
@@ -46,15 +49,16 @@
 
 <script>
 import firebase from 'firebase'
+import db from '@/firebase/init'
 
 export default {
     name: 'Navbar',
     data(){
         return{
-            user: null
+            user: null,
+            usertype: null
         }
     },
-    //jika di klik logout maka akan keluar
     methods: {
         logout(){
             firebase.auth().signOut().then(() => {
@@ -67,7 +71,24 @@ export default {
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
                 this.user = user
-                //console.log(user)
+                //console.log(user.uid)
+
+                let pengguna = db.collection('users')
+                let querypengguna = pengguna.where('user_id', '==', user.uid).get().then(snapshot => {
+                    if (snapshot.empty){
+                        console.log('No matching users documents.');
+                        return;
+                    } 
+                    snapshot.forEach(doc => {
+                        //console.log(doc.id, '=>', doc.data());
+                        this.usertype = doc.data().type
+                        //console.log(this.usertype)
+                    });
+                }).catch(err => {
+                    console.log('Error getting documents', err);
+                });
+
+                
             } else {
                 this.user = null
             }

@@ -1,14 +1,16 @@
 <template>
     <div class="orders">
         <h2>Orders</h2>
-
+        <router-link :to="{ name:'Mutasi' }"><button type="button" class="btn btn-primary">Cek Mutasi</button></router-link>
+        <p>&nbsp;</p>
+        
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th scope="col">ID</th>
+                    <th scope="col">Invoice</th>
                     <th scope="col">Name</th>
                     <th scope="col">Date</th>
-                    <th scope="col">Gross Revenue</th>
+                    <th scope="col">Address</th>
                     <th scope="col">Status</th>
                     <th scope="col">Payment</th>
                     <th scope="col">Action</th>
@@ -18,10 +20,13 @@
 
                 <!-- Perulangan menampilkan product dari database -->
                 <tr v-for="(order, index) in orderdisplay" :key="index">
-                    <td class="align-middle">{{ order.verif }}</td>
+                    <td class="align-middle">{{ order.verif }}
+
+                        <p>Rp. {{ order.gross }}</p>
+                    </td>
                     <td class="align-middle">{{ order.name }}<br>{{ order.whatsapp }}</td>
-                    <td class="align-middle">{{ order.date.toDate() }}</td>
-                    <td class="align-middle">Rp.{{ order.gross }}</td>
+                    <td class="align-middle">{{ order.date.substring(12,17) }}<br>{{ order.date.substring(1,11) }}</td>
+                    <td class="align-middle">{{ order.alamat }}</td>
                     <td class="align-middle">
                         <div v-if="order.status==='Pending'" class="alert alert-warning" role="alert">{{ order.status }}</div>
                         <div v-else-if="order.status==='Processing'" class="alert alert-secondary" role="alert">{{ order.status }}</div>
@@ -43,17 +48,16 @@
                             <a class="dropdown-item" v-if="order.status!=='Processing'" @click="statusnya('Processing', order.idorder)" exact :style="{ cursor: 'pointer'}">Processing</a>
                             <a class="dropdown-item" v-if="order.status!=='Completed'" @click="statusnya('Completed', order.idorder)" exact :style="{ cursor: 'pointer'}">Completed</a>
                             <a class="dropdown-item" v-if="order.status!=='Cancelled'" @click="statusnya('Cancelled', order.idorder)" exact :style="{ cursor: 'pointer'}">Cancelled</a>
+
                             <div class="dropdown-divider"></div>
+
                             <a class="dropdown-item" v-if="order.paystatus!=='Unpaid'" @click="paystatusnya('Unpaid', order.idorder)" exact :style="{ cursor: 'pointer'}">Unpaid</a>
                             <a class="dropdown-item" v-if="order.paystatus!=='Paid'" @click="paystatusnya('Paid', order.idorder)" exact :style="{ cursor: 'pointer'}">Paid</a>
                             <a class="dropdown-item" v-if="order.paystatus!=='Refunded'" @click="paystatusnya('Refunded', order.idorder)" exact :style="{ cursor: 'pointer'}">Refunded</a>
+
+                            <div class="dropdown-divider"></div>
                         </div>
                         </div>
-                    </td>
-                    <td class="align-middle">
-                        <button @click="editProduct(order.idorder)" type="button" class="btn btn-success">Edit</button>
-                        <button @click="deleteProduct(order.idorder, index)" type="button" class="btn btn-danger">Delete</button>
-                        <a class="text-primary" @click="buyProduct(order.idorder)" exact :style="{ cursor: 'pointer'}">checkout page</a>
                     </td>
                 </tr>
                 <!-- END -->
@@ -71,7 +75,8 @@ export default {
     name: 'Orders',
     data(){
         return{
-            orderdisplay: []
+            orderdisplay:[],
+            kotane:[]
         }
     },
     created(){
@@ -90,7 +95,7 @@ export default {
 
         showData(){
             let productdisplay=[]
-            db.collection('orders')
+            db.collection('orders').orderBy('date')
             .onSnapshot((snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if(change.type === 'added'){
@@ -98,11 +103,13 @@ export default {
                             verif: change.doc.data().verif,
                             name: change.doc.data().name,
                             whatsapp: change.doc.data().whatsapp,
-                            date: change.doc.data().date,
+                            date: JSON.stringify(change.doc.data().date.toDate()),
                             gross: change.doc.data().gross,
                             status: change.doc.data().status,
                             paystatus: change.doc.data().paystatus,
-                            idorder: change.doc.id
+                            idorder: change.doc.id,
+                            alamat: change.doc.data().loc.alamat,
+                            city: change.doc.data().loc.city
                         })
                     }
                     if (change.type === 'removed') {

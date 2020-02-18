@@ -1,7 +1,7 @@
 <template>
     <div class="product">
         <h2>Product</h2>
-        <router-link :to="{ name:'AddProduct' }"><button type="button" class="btn btn-success">+Add Product</button></router-link>
+        <router-link :to="{ name:'AddProduct' }" v-if="usertype=='admin'"><button type="button" class="btn btn-success">+Add Product</button></router-link>
         <p>&nbsp;</p>
 
 
@@ -19,12 +19,15 @@
                 <!-- Perulangan menampilkan product dari database -->
                 <tr v-for="(product, index) in productdisplay" :key="index">
                     <td class="align-middle"><img :src=product.pimage alt="" width="75"></td>
-                    <td class="align-middle">{{ product.pname }}</td>
-                    <td class="align-middle">{{ product.pprice }}</td>
                     <td class="align-middle">
-                        <button @click="editProduct(product.idprod)" type="button" class="btn btn-success">Edit</button>
-                        <button @click="deleteProduct(product.idprod, index)" type="button" class="btn btn-danger">Delete</button>
-                        <a class="text-primary" @click="buyProduct(product.plink)" exact :style="{ cursor: 'pointer'}">checkout page</a>
+                        {{ product.pname }}<br>
+                        <a class="text-primary" @click="buyProduct(product.plink)" exact :style="{ cursor: 'pointer'}"><small>checkout page</small></a>
+                    </td>
+                    <td class="align-middle">Rp.{{ product.pprice }}</td>
+                    <td class="align-middle">
+                        <button v-if="usertype=='admin'" @click="editProduct(product.idprod)" type="button" class="btn btn-success">Edit</button>
+                        <button v-if="usertype=='admin'" @click="deleteProduct(product.idprod, index)" type="button" class="btn btn-danger">Delete</button>
+                        
                     </td>
                 </tr>
                 <!-- END -->
@@ -48,11 +51,29 @@ export default {
             productdisplay:[],
             pprice: null,
             plink: null,
-            idprod: null
+            idprod: null,
+
+            user: null,
+            usertype:null
         }
     },
     created(){
-        //view product
+        //console.log(firebase.auth().currentUser.uid) // Memanggil pengguna yang sedang login
+        let pengguna = db.collection('users') // Cari type user pada database
+        let querypengguna = pengguna.where('user_id', '==', firebase.auth().currentUser.uid).get().then(snapshot => {
+            if (snapshot.empty){
+                console.log('No matching users documents.');
+                return;
+            } 
+            snapshot.forEach(doc => {
+            //console.log(doc.id, '=>', doc.data());
+            this.usertype = doc.data().type
+            //console.log(this.usertype)
+        });
+        }).catch(err => {
+            console.log('Error getting users documents', err);
+        });
+
         this.showData()
         //console.log(this.productdisplay)
     },

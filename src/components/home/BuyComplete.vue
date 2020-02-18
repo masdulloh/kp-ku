@@ -1,22 +1,39 @@
 <template>
     <div class="buycomplete">
-        <h2>Orders</h2>
-        <p>Pesanan </p>
+        <h2>Buy Complete</h2>
+        <p class="text-center" v-if="orderdata">Pesanan {{ orderdata.gross }}</p>
+        <p>Silahkan melakukan pembayaran sebesar</p>
+        <p v-if="bankdata">pada nomor rekening dibawah ini {{ bankdata.account_number }}</p>
     </div>
 </template>
 
 <script>
 import db from '@/firebase/init'
 import firebase from 'firebase'
+import axios from 'axios'
 
 export default {
     name: 'BuyComplete',
     data(){
         return{
-
+            orderdata:null,
+            bankdata:null
         }
     },
+
     created(){
+        axios.get('https://api.url.my.id/api/raja-ongkir/mootabank')
+        .then(response => {
+            // handle success
+            this.bankdata= response.data.body[0];
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        })
+        .then(function () {
+            // always executed
+        });
 
         let ref = db.collection('orders')
         //get current product
@@ -24,13 +41,14 @@ export default {
         .then(doc => {
             if (!doc.exists) {
                 // Jika produk yang mau di edit tidak ditemukan
-                console.log('No such product id!');
+                console.log('No such order id!');
             } else {
-                console.log('Document data:', doc.data());
+                //console.log('Order data:', doc.data());
+                this.orderdata=doc.data();
             }
         })
         .catch(err => {
-            console.log('Error getting documents', err);
+            console.log('Error getting order documents', err);
         })
     },
     mounted(){

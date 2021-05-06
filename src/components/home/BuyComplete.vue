@@ -22,6 +22,7 @@ export default {
     },
 
     created(){
+        //digunakan pihak ke 3 untuk request API raja ongkir karena jika menggunakan vue tidak dapat langsung request api
         axios.get('https://api.url.my.id/api/raja-ongkir/mootabank')
         .then(response => {
             // handle success

@@ -177,7 +177,7 @@ export default {
                 this.hitung();
 
             } else {
-                axios.post('https://api.url.my.id/api/raja-ongkir/cost',{
+                axios.post('https://apikp.masdulloh.xyz/api/raja-ongkir/cost',{
                     'origin':this.pcity,
                     'destination':this.ocity,
                     'weight':this.oweight,

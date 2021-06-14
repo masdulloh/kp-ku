@@ -1,9 +1,13 @@
 <template>
     <div class="buycomplete">
         <h2>Buy Complete</h2>
-        <p class="text-center" v-if="orderdata">Pesanan {{ orderdata.gross }}</p>
-        <p>Silahkan melakukan pembayaran sebesar</p>
-        <p v-if="bankdata">pada nomor rekening dibawah ini {{ bankdata.account_number }}</p>
+        <p class="text-center" v-if="orderdata">Pesanan Berhasil!<br></p>
+        <p class="text-center">Silahkan kakak <b>{{ orderdata.name }}</b> melakukan pembayaran sebesar <big><b>Rp. {{ orderdata.gross }}</b></big></p>
+        <p class="text-center" v-if="bankdata">pada nomor rekening <b>{{ bankdata.bank_type }}</b> dibawah ini</p>
+        <p class="text-center">
+        Atas Nama<br><big><b>{{bankdata.atas_nama}}</b></big><br>
+        Nomor Rekening<br><big><b>{{ bankdata.account_number }}</b></big><br>
+        Untuk konfirmasi otomatis, silahkan tuliskan <b>{{ orderdata.verif }}</b> pada berita transfer.</p>
     </div>
 </template>
 
